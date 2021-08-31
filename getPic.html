@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Flat is Justice! - ship lock map maker</title>
+    <meta name="theme-color" content="#082E6B" />
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Flat is Justice - ship lock map maker">
+    <meta name="twitter:description" content="Make ship lock maps">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
+    <script src="https://unpkg.com/blob-util/dist/blob-util.min.js"></script>
+    <!-- 添加jq和脚本 -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="selectPartCodes.js"></script>
+
+    <!--  -->
+    <style type="text/css">
+        input[type="number"] {
+            width: 75px;
+        }
+
+        canvas {
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!--导入main.js -->
+    <div>
+        <input type="file" id="files" style="display: none" onchange="fileImport();">
+        <input type="button" id="fileImport" value="导入">
+    </div>
+    <a href="."><b>Flat is Justice - Home</b></a><br>
+    <br>
+    main.js section: <br><textarea id="code">
+
+</textarea><br>
+    Map: <input type="text" id="mapid" value="48" onchange="update()"> <br>
+    <br>
+    <button name="Update" onclick="update()">Force update</button><br><br>
+    <a id="download">Download</a><br>
+    <b>Edges map</b><br>
+    <script type="text/javascript">
+        $("#fileImport").click(function () {
+            $("#files").click();
+        })
+        var show = {},
+            locData, canvas, loader, map;
+        let SERVER = "kcs.kcwiki.cn";
+
+        window.PIXI.utils.skipHello();
+        let app = new PIXI.Application({
+            width: 280,
+            height: 338,
+            transparent: true,
+            forceCanvas: true,
+            preserveDrawingBuffer: true
+        });
+        document.body.appendChild(canvas = app.view);
+
+        let xOff = 0,
+            yOff = 0,
+            drawPhase = "";
+
+        let getTexture = (loc, id) => {
+            let texid = loc.toLowerCase() + '_' + id;
+            if (PIXI.TextureCache[texid])
+                return texid;
+            switch (drawPhase) {
+                case 'area':
+                    return "https://i.imgur.com/QXkeLzo.png";
+                case 'plate':
+                    return 'https://i.imgur.com/wU3MZmG.png';
+                case 'title':
+                    return 'https://i.imgur.com/s2hHrKl.png';
+                case 'arrow':
+                case 'label':
+                    return 'https://i.imgur.com/ESZl1ar.png';
+                case 'minitext':
+                    return 'https://i.imgur.com/GJrSTKS.png'
+                case 'map':
+                    return 'https://i.imgur.com/eUMcFQV.png';
+                default:
+                    return 'https://i.imgur.com/WxF5fiw.png';
+            }
+        };
+        let _plate = {
+            removeChildren: () => 0
+        }
+        let _createBG = (x, y, id) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff, y + yOff);
+            sprite.alpha = 63 / 64
+            bgLayer.addChild(sprite);
+        };
+        let _cleanArrow = () => 0;
+        let _createArrow = (x, y, id) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff, y + yOff);
+            arrowLayer.addChild(sprite);
+        };
+        let _cleanArea = () => 0;
+        let _createArea = (x, y, id) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff, y + yOff);
+            areaLayer.addChild(sprite);
+        };
+        let _createTitle = (x, y, id) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff + Math.round(140 - sprite.width / 2), y + yOff);
+            titleLayer.addChild(sprite);
+        };
+        let _cleanLabel = () => 0;
+        let _createLabel = (x, y, id) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff, y + yOff);
+            labelLayer.addChild(sprite);
+        };
+        let _createMiniText = _createLabel
+        let _cleanMiniText = () => 0;
+        let i = (id, x, y) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff, y + yOff);
+            miscLayer.addChild(sprite);
+        };
+        let _createPlateIcon = (id, x, y) => {
+            let frame = PIXI.Texture.fromFrame(id);
+            let sprite = new PIXI.Sprite(frame);
+            sprite.position.set(x + xOff, y + yOff);
+            miscLayer.addChild(sprite);
+        };
+        let bgLayer, areaLayer, arrowLayer, titleLayer, labelLayer, miscLayer;
+
+        function update(selectedmap = document.getElementById("mapid").value) {
+            for (let i = app.stage.children.length - 1; i >= 0; i--) {
+                app.stage.removeChild(app.stage.children[i]);
+            };
+            app.stage.addChild(bgLayer = new PIXI.Container);
+            app.stage.addChild(areaLayer = new PIXI.Container);
+            app.stage.addChild(arrowLayer = new PIXI.Container);
+            app.stage.addChild(titleLayer = new PIXI.Container);
+            app.stage.addChild(labelLayer = new PIXI.Container);
+            app.stage.addChild(miscLayer = new PIXI.Container);
+
+            map = parseInt(selectedmap.replace('-'))
+           
+            //自动匹配图片编号
+            document.getElementById("code").value=codes
+            $('#mapid').val(picNum)
+            code=document.getElementById("code").value
+            let type = ''
+            let currentCode = '\n';
+            for (let line of code.split("\n")) {
+                if (line.indexOf('    },') > 0) {
+                    console.log(currentCode)
+                    console.log(`window.${type}=${currentCode}}`)
+                    if (type != '')
+                        eval(`window.${type}=${currentCode}}`)
+                    type = '';
+                    currentCode = '\n';
+                } else if (line.indexOf('prototype') > 0) {
+                    console.log("pt", line);
+                    for (let posType of ['_getBGTexture', '_getTitleTexture', '_createAreaAnimation',
+                            '_createArrowAnimation', '_createLabelAnimation', '_createPlate',
+                            '_createMiniTextAnimation'
+                        ])
+                        if (line.indexOf(posType) > 0)
+                            type = posType;
+
+                    currentCode = line.split(' = ')[1] + '\n';
+                } else {
+                    if (type == '_createPlate') console.log('eeee', line)
+                    let rep = line.replace(/\w+.([\w]+)\.getTexture\(/g, "getTexture('$1', ").replace(/this./g, '') +
+                        '\n';
+
+                    if (type == '_createPlate')
+                        rep = rep.replace(/(void )?[_0-9a-z]+\(getTexture/gi, "_createPlateIcon\(getTexture");
+                    if (type == '_createPlate')
+                        rep = rep.replace(/return [_0-9a-z]+/gi, "return _createPlateIcon");
+                    if (type == '_createPlate') console.log('eeee', rep)
+                    currentCode += rep;
+                }
+            }
+
+            loader = new PIXI.loaders.Loader;
+
+            loader.add([
+                getPath('sally_strategymap.json'),
+                getPath('sally_strategymap_second.json'),
+                'https://i.imgur.com/wU3MZmG.png', // Unkown ship lock
+                'https://i.imgur.com/QXkeLzo.png', // !
+                'https://i.imgur.com/WxF5fiw.png', // flag
+                'https://i.imgur.com/ESZl1ar.png', // empty
+                'https://i.imgur.com/eUMcFQV.png', // map
+                'https://i.imgur.com/s2hHrKl.png', // title
+                'https://i.imgur.com/GJrSTKS.png' // minitext
+            ]).load(function () {
+                delete document.getElementById("download").href
+                for (let i = 1; _getBGTexture(map * 10 + i) != PIXI.Texture.EMPTY; i++)
+                    showMap(map * 10 + i);
+
+                blobUtil.canvasToBlob(canvas, 'image/png').then(function (blob) {
+                    console.log(blob.size)
+                    document.getElementById("download").href = blobUtil.createObjectURL(blob);
+                })
+                document.getElementById("download").addEventListener('click', function () {
+                    let d = new Date();
+                    this.download = `Tag lock ${map}.png`;
+                }, false);
+
+            })
+        }
+
+        function getPath(url) {
+            return `http://${SERVER}/kcs2/img/sally/${url}`
+        }
+
+        function showMap(map) {
+            console.log("Show map")
+            console.log(map, _getBGTexture(map))
+            xOff = 8 + (map % 10 - 1) * 300;
+            yOff = 8;
+            app.view.width = (map % 10) * 300;
+            drawPhase = 'map';
+            try {
+                _createBG(0, 0, _getBGTexture(map));
+            } catch (e) {
+                console.error(e)
+            }
+            drawPhase = 'arrow';
+            try {
+                _createArrowAnimation(map);
+            } catch (e) {
+                console.error(e)
+            }
+            drawPhase = 'area';
+            try {
+                _createAreaAnimation(map);
+            } catch (e) {
+                console.error(e)
+            }
+            drawPhase = 'label';
+            try {
+                _createLabelAnimation(map);
+            } catch (e) {
+                console.error(e)
+            }
+            drawPhase = 'miniText';
+            try {
+                _createMiniTextAnimation(map);
+            } catch (e) {
+                console.error(e)
+            }
+            drawPhase = 'plate';
+            try {
+                _createPlate(map);
+            } catch (e) {
+                console.error(e)
+            }
+            drawPhase = 'title';
+            try {
+                _createTitle(0, 305, _getTitleTexture(map));
+            } catch (e) {
+                console.error(e)
+            }
+
+            app.render();
+        }
+        let secretstyle = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 20,
+            fill: "#393",
+        });
+
+        update();
+    </script>
+</body>
+
+</html>

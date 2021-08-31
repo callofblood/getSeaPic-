@@ -1,0 +1,144 @@
+_slf.prototype._getBGTexture = function(_slk) {
+        switch (_slk) {
+          case 511:
+            return _slc.SALLY_STRATEGYMAP.getTexture(24);
+          case 512:
+            return _slc.SALLY_STRATEGYMAP.getTexture(25);
+          case 513:
+            return _sld.SALLY_STRATEGYMAP_SECOND.getTexture(17);
+          default:
+            return PIXI.Texture.EMPTY;
+        }
+        },
+ _slf.prototype._createAreaAnimation = function(_sll) {
+        switch (this._cleanArea(), _sll) {
+          case 511:
+            return this._createArea(0, 92, _slc.SALLY_STRATEGYMAP.getTexture(0)), this._createArea(40, 68, _slc.SALLY_STRATEGYMAP.getTexture(1)), void this._createArea(123, 78, _slc.SALLY_STRATEGYMAP.getTexture(2));
+          case 512:
+            return this._createArea(45, 103, _slc.SALLY_STRATEGYMAP.getTexture(3)), this._createArea(24, 11, _slc.SALLY_STRATEGYMAP.getTexture(4)), this._createArea(67, 54, _slc.SALLY_STRATEGYMAP.getTexture(5)), void this._createArea(133, 98, _slc.SALLY_STRATEGYMAP.getTexture(6));
+          case 513:
+            return this._createArea(131, 123, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(0)), this._createArea(148, 85, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(1)), this._createArea(78, 83, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(2)), void this._createArea(0, 7, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(3));
+          default:
+            return;
+        }
+        },
+ _slf.prototype._createArrowAnimation = function(_slm) {
+        switch (this._cleanArrow(), _slm) {
+          case 511:
+            return this._createArrow(32, 126, _slc.SALLY_STRATEGYMAP.getTexture(9), _slc.SALLY_STRATEGYMAP.getTexture(10)), void this._createArrow(171, 119, _slc.SALLY_STRATEGYMAP.getTexture(7), _slc.SALLY_STRATEGYMAP.getTexture(8));
+          case 512:
+            return this._createArrow(7, 49, _slc.SALLY_STRATEGYMAP.getTexture(11), _slc.SALLY_STRATEGYMAP.getTexture(12)), void this._createArrow(157, 161, _slc.SALLY_STRATEGYMAP.getTexture(13), _slc.SALLY_STRATEGYMAP.getTexture(14));
+          case 513:
+            return this._createArrow(6, 38, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(10), _sld.SALLY_STRATEGYMAP_SECOND.getTexture(11)), this._createArrow(45, 138, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(4), _sld.SALLY_STRATEGYMAP_SECOND.getTexture(5)), this._createArrow(41, 124, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(6), _sld.SALLY_STRATEGYMAP_SECOND.getTexture(7)), void this._createArrow(124, 119, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(8), _sld.SALLY_STRATEGYMAP_SECOND.getTexture(9));
+          default:
+            return;
+        }
+        },
+ _slf.prototype._createArea = function(_sln, _slo, _slp) {
+        var _slq = new _slr(_slp);
+        _slq.x = _sln, _slq.y = _slo, this._area_layer.addChild(_slq);
+        },
+ _slf.prototype._cleanArea = function() {
+        for (var _sls = 0, _slt = this._area_layer.children; _sls < _slt.length; _sls++) _slt[_sls].dispose();
+        this._area_layer.removeChildren();
+        },
+ _slf.prototype._createArrow = function(_slu, _slv, _slw, _slx) {
+        var _sly = new _slz(_slw, _slx);
+        _sly.x = _slu, _sly.y = _slv, this._arrow_layer.addChild(_sly);
+        },
+ _slf.prototype._cleanArrow = function() {
+        for (var _sm0 = 0, _sm1 = this._arrow_layer.children; _sm0 < _sm1.length; _sm0++) _sm1[_sm0].dispose();
+        this._arrow_layer.removeChildren();
+        },
+ _slf.prototype._createAirBase = function(_sm2, _sm3) {
+        this._base.removeChildren();
+        var _sm4, _sm5 = null;
+        switch (_sm2) {
+          case 511:
+            _sm5 = new PIXI['Point'](137, 118);
+            break;
+          case 512:
+            _sm5 = 1 == _sm3 ? new PIXI['Point'](240, 176) : new PIXI['Point'](131, 168);
+            break;
+          case 513:
+            _sm5 = 4 <= _sm3 ? new PIXI['Point'](225, 179) : new PIXI['Point'](36, 153);
+        }
+        null != _sm5 && ((_sm4 = new PIXI['Sprite'](_slc.SALLY_STRATEGYMAP.getTexture(15))).position.set(_sm5.x, _sm5.y), this._base.addChild(_sm4));
+        },
+ _slf.prototype._createPlate = function(_sm6) {
+        var _sm7 = this;
+
+        function _sm8(_sm9, _sma, _smb) {
+          var _smc = new PIXI['Sprite'](_sm9);
+          _smc.position.set(_sma, _smb), _sm7._plate.addChild(_smc);
+        }
+        switch (this._plate.removeChildren(), _sm6) {
+          case 511:
+            return _sm8(_slc.SALLY_STRATEGYMAP.getTexture(16), 208, 174), void _sm8(_slc.SALLY_STRATEGYMAP.getTexture(17), 78, 138);
+          case 512:
+            return _sm8(_slc.SALLY_STRATEGYMAP.getTexture(18), 187, 176), void _sm8(_slc.SALLY_STRATEGYMAP.getTexture(19), 28, 156);
+          case 513:
+            return _sm8(_slc.SALLY_STRATEGYMAP.getTexture(19), 2, 108), _sm8(_sld.SALLY_STRATEGYMAP_SECOND.getTexture(12), 114, 187), _sm8(_sld.SALLY_STRATEGYMAP_SECOND.getTexture(13), 118, 120), void _sm8(_sld.SALLY_STRATEGYMAP_SECOND.getTexture(14), 75, 130);
+          default:
+            return;
+        }
+        },
+ _slf.prototype._createLabelAnimation = function(_smd) {
+        switch (this._cleanLabel(), _smd) {
+          case 511:
+            return void this._createLabel(78, 69, _slc.SALLY_STRATEGYMAP.getTexture(20), _slc.SALLY_STRATEGYMAP.getTexture(21));
+          case 512:
+            return void this._createLabel(18, 108, _slc.SALLY_STRATEGYMAP.getTexture(22), _slc.SALLY_STRATEGYMAP.getTexture(23));
+          case 513:
+            return void this._createLabel(39, 30, _sld.SALLY_STRATEGYMAP_SECOND.getTexture(15), _sld.SALLY_STRATEGYMAP_SECOND.getTexture(16));
+          default:
+            return;
+        }
+        },
+ _slf.prototype._createLabel = function(_sme, _smf, _smg, _smh) {
+        var _smi = new _smj(_smg, _smh);
+        _smi.x = _sme, _smi.y = _smf, this._label_layer.addChild(_smi);
+        },
+ _slf.prototype._cleanLabel = function() {
+        for (var _smk = 0, _sml = this._label_layer.children; _smk < _sml.length; _smk++) _sml[_smk].dispose();
+        this._label_layer.removeChildren();
+        },
+ _slf.prototype._createMiniTextAnimation = function(_smm, _smn) {
+        switch (this._cleanMiniText(), _smm) {
+          case 512:
+          case 513:
+            return void(1 < _smn && this._createMiniText(192, 286, _slc.SALLY_STRATEGYMAP.getTexture(29), _slc.SALLY_STRATEGYMAP.getTexture(30)));
+          default:
+            return;
+        }
+        },
+ _slf.prototype._createMiniText = function(_smo, _smp, _smq, _smr) {
+        var _sms = new _smt(_smq, _smr);
+        _sms.x = _smo, _sms.y = _smp, this._mini_text_layer.addChild(_sms);
+        },
+ _slf.prototype._cleanMiniText = function() {
+        for (var _smu = 0, _smv = this._mini_text_layer.children; _smu < _smv.length; _smu++) _smv[_smu].dispose();
+        this._mini_text_layer.removeChildren();
+        },
+ _slf.prototype._getTitle1Texture = function(_smw) {
+        switch (_smw) {
+          case 511:
+          case 512:
+          case 513:
+            return _slc.SALLY_STRATEGYMAP.getTexture(28);
+          default:
+            return PIXI.Texture.EMPTY;
+        }
+        },
+ _slf.prototype._getTitle2Texture = function(_smx) {
+        switch (_smx) {
+          case 511:
+            return _slc.SALLY_STRATEGYMAP.getTexture(26);
+          case 512:
+            return _slc.SALLY_STRATEGYMAP.getTexture(27);
+          case 513:
+            return _sld.SALLY_STRATEGYMAP_SECOND.getTexture(18);
+          default:
+            return PIXI.Texture.EMPTY;
+        }
+      }, _slf);

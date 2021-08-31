@@ -1,0 +1,4 @@
+将main.js置于py文件同文件夹下，
+py运行getPicCode.py；
+打开getPic.html，导入filteredPicCode.txt
+点击force update。
